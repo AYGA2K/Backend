@@ -4,34 +4,40 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
     /**
-     * Display a listing of the users.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        $users = User::with('covidFlags', 'qrCodes')->get();
-        return response()->json($users);
-    }
-    /**
-     * Store a newly created user in storage.
+     * Sign up a new user.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function register(Request $request)
     {
         // Validate the incoming request data
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email',
             'password' => 'required|string|min:8',
             'udid' => 'required|string'
         ]);
+
+        if ($validator->fails()) {
+            // Return validation errors if any
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Check if the user already exists
+        $existingUser = User::where('email', $request->email)->first();
+
+        if ($existingUser) {
+            // Return a JSON response indicating that the user already exists
+            return response()->json(['message' => 'User already exists'], 409);
+        }
 
         // Create a new User instance
         $user = User::create([
@@ -43,6 +49,49 @@ class UserController extends Controller
 
         // Return a JSON response with the newly created User and a status code of 201 (Created)
         return response()->json($user, 201);
+    }
+    /**
+     * Login user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function login(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+
+            return response()->json([
+
+                'message' => 'User not found.'
+
+            ], 404);
+        }
+        // Attempt to log in the user
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            // Authentication was successful
+            $user->token = $user->createToken('myApp')->plainTextToken;
+            return response()->json(['token' => $user->token], 200);
+        } else {
+            // Authentication failed
+            return response()->json(['message' => 'Invalid credentials'], 401);
+        }
+    }
+    /**
+     * Display a listing of the users.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $users = User::with('covidFlags', 'qrCodes')->get();
+        return response()->json($users);
     }
 
     /**

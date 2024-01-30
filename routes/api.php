@@ -34,7 +34,8 @@ Route::put('/covidflags/{id}', [CovidFlagController::class, 'update']);
 Route::delete('/covidflags/{id}', [CovidFlagController::class, 'destroy']);
 
 Route::get('/users', [UserController::class, 'index']);
-Route::post('/users', [UserController::class, 'store']);
+Route::post('/users/register', [UserController::class, 'register']);
+Route::post('/users/login', [UserController::class, 'login']);
 Route::get('/users/{id}', [UserController::class, 'show']);
 Route::put('/users/{id}', [UserController::class, 'update']);
 Route::delete('/users/{id}', [UserController::class, 'destroy']);
