@@ -6,7 +6,7 @@
     -   [Clone the Repository](#clone-the-repository)
     -   [Install Dependencies](#install-dependencies)
     -   [Copy Environment File](#copy-environment-file)
-    -   [Generate Application Key](#generate-application-key)
+    -   [Install Sail](#install-sail)
     -   [Start Laravel Sail](#start-laravel-sail)
     -   [Run Migrations](#run-migrations)
     -   [Access the Application](#access-the-application)
@@ -35,12 +35,6 @@ Follow these steps to set up and run the project:
 ```bash
 git clone <repository_url>
 cd <project_directory>
-```
-
-### Install Dependencies
-
-```bash
-composer install
 ```
 
 ### Copy Environment File
