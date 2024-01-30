@@ -49,10 +49,11 @@ composer install
 cp .env.example .env
 ```
 
-### Generate Application Key
+### Install Sail
 
 ```bash
-php artisan key:generate
+composer require laravel/sail --dev
+php artisan sail:install
 ```
 
 ### Start Laravel Sail
